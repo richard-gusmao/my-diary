@@ -2,9 +2,9 @@
 
 A new Flutter project.
 
-## Getting Started
+## Flutter Android App
 
-This project is a starting point for a Flutter application.
+This is a Flutter Android App built using imagepicker and flutter sound packages. It is a simple Diary to keep all your memories and stories together.
 
 A few resources to get you started if this is your first Flutter project:
 
