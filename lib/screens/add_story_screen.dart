@@ -52,7 +52,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     icon: Icon(
                       Icons.save_alt,
                       // Icons.more_vert_outlined,
-                      color: Colors.blueAccent,
+                      color: Color.fromARGB(255, 239, 130, 84),
                       size: 30,
                     ),
                   ),
@@ -92,8 +92,11 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 239, 130, 84),
-        ),
+            color: Color.fromARGB(255, 239, 130, 84),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            )),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -109,7 +112,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               icon: Icon(
                 Icons.camera_alt,
                 color: Colors.white,
-                size: 35,
+                size: 30,
               ),
             ),
             IconButton(
@@ -117,7 +120,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               icon: Icon(
                 Icons.mic,
                 color: Colors.white,
-                size: 35,
+                size: 30,
               ),
             )
           ],
