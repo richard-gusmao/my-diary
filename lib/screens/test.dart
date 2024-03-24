@@ -134,3 +134,73 @@
 //     );
 //   }
 // }
+import 'package:flutter/material.dart';
+import 'package:my_diary/model/database_.dart';
+import 'package:my_diary/model/diary_model.dart';
+
+class TestPage extends StatefulWidget {
+  const TestPage({super.key});
+
+  @override
+  State<TestPage> createState() => _TestPageState();
+}
+
+class _TestPageState extends State<TestPage> {
+  List stories = [];
+  Future<void> fetchStories() async {
+    List myStories = await Diary().showAll();
+    setState(() {
+      stories = myStories;
+    });
+  }
+
+  @override
+  void initState() {
+    fetchStories();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        toolbarHeight: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: 100),
+            Text(
+              "Hello MUndo, como",
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(stories.length.toString()),
+            SizedBox(
+              height: 20,
+            ),
+            Flexible(
+              child: ListView.builder(
+                itemCount: stories.length,
+                itemBuilder: (context, index) {
+                  print(stories[0]['title']);
+                  return Container(
+                    child: Column(
+                      children: [],
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

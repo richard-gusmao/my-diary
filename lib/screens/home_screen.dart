@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:my_diary/components/card_home.dart';
 import 'package:my_diary/components/month_card.dart';
 import 'package:my_diary/components/my_card.dart';
 import 'package:flutter/material.dart';
+import 'package:my_diary/model/diary_model.dart';
 import 'package:my_diary/screens/search_screen.dart';
 import 'package:my_diary/screens/setting_screen.dart';
+import 'package:my_diary/screens/test.dart';
 
 import 'add_story_screen.dart';
 
@@ -29,6 +33,34 @@ class _HomeScreenState extends State<HomeScreen> {
     'November',
     'December'
   ];
+  List stories = [];
+  Future<void> fecthData() async {
+    List data = await Diary().showAll();
+    setState(() {
+      stories = data;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fecthData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fecthData();
+  }
+
+  @override
+  void dispose() {
+    setState(() {
+      stories = [];
+    });
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,12 +161,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Today",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
+                            GestureDetector(
+                              onTap: () {
+                                Diary().deleteAll();
+                                print("All Post Deleted");
+                              },
+                              child: Text(
+                                "Today",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -207,39 +245,77 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 20,
               ),
-              Container(
-                height: 40,
-                child: ListView.builder(
-                    itemCount: 10,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      // MONTH VARIABLE
-                      String m = months[index];
-                      return MonthCard(
-                          month: m, isSelected: index == 0 ? true : false);
-                    }),
-              ),
+              // Container(
+              //   height: 40,
+              //   child: ListView.builder(
+              //       itemCount: 10,
+              //       scrollDirection: Axis.horizontal,
+              //       itemBuilder: (context, index) {
+              //         // MONTH VARIABLE
+              //         String m = months[index];
+              //         return MonthCard(
+              //             month: m, isSelected: index == 0 ? true : false);
+              //       }),
+              // ),
               SizedBox(
                 height: 20,
               ),
-              cardHome(
-                date: null,
-                time: null,
+              Container(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: stories.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (contex, index) {
+                      Map story = stories[index];
+                      int contentLength = (story['content'].length >= 100)
+                          ? 100
+                          : story['content'].length;
+                      return Container(
+                        padding: const EdgeInsets.all(10.0),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              story['title'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            // story['image'].toString() != ""
+                            //     ? Container(
+                            //         height: 100,
+                            //         width: double.infinity,
+                            //         decoration: BoxDecoration(),
+                            //         child: Image.file(
+                            //           fit: BoxFit.cover,
+                            //           File(
+                            //             story['image'],
+                            //           ),
+                            //         ),
+                            //       )
+                            //     : SizedBox(
+                            //         height: 20,
+                            //       ),
+                            Text(
+                                "${story['content'].toString().substring(0, contentLength)} ...")
+                          ],
+                        ),
+                      );
+                    }),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              cardHome(
-                date: null,
-                time: null,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              cardHome(
-                date: null,
-                time: null,
-              ),
+              // cardHome(
+              //   date: null,
+              //   time: null,
+              // ),
             ],
           ),
         ),
