@@ -1,14 +1,10 @@
-import 'dart:io';
-
-import 'package:my_diary/components/card_home.dart';
-import 'package:my_diary/components/month_card.dart';
+import 'package:my_diary/components/home_card_post.dart';
 import 'package:my_diary/components/my_card.dart';
 import 'package:flutter/material.dart';
 import 'package:my_diary/model/diary_model.dart';
 import 'package:my_diary/screens/search_screen.dart';
 import 'package:my_diary/screens/setting_screen.dart';
-import 'package:my_diary/screens/test.dart';
-
+import 'package:my_diary/screens/show_story.dart';
 import 'add_story_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,46 +15,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
   List stories = [];
-  Future<void> fecthData() async {
+  List years = [];
+  Future<void> fetchData() async {
     List data = await Diary().showAll();
     setState(() {
       stories = data;
     });
   }
 
+  Future<void> fetchYear() async {
+    List data = await Diary().getYear();
+    setState(() {
+      years = data;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    fecthData();
+    fetchData();
+    fetchYear();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    fecthData();
+    fetchData();
   }
 
   @override
   void dispose() {
+    super.dispose();
     setState(() {
       stories = [];
     });
-    super.dispose();
   }
 
   @override
@@ -164,7 +155,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             GestureDetector(
                               onTap: () {
                                 Diary().deleteAll();
-                                print("All Post Deleted");
+                                setState(() {
+                                  stories = [];
+                                  years = [];
+                                });
                               },
                               child: Text(
                                 "Today",
@@ -190,13 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
-                                  "ºC",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                // Text(
+                                //   "ºC",
+                                //   style: TextStyle(
+                                //     color: Colors.white,
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ],
@@ -213,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20,
                     ),
                     Text(
-                      "Huambo, Angola, Rua 11 de Novembro",
+                      "You Got This",
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -225,38 +219,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               Container(
-                height: 90,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    const MyCard(
-                      memories: 100,
-                      year: 2022,
-                      isSelected: true,
-                    ),
-                    const MyCard(
-                      year: 2021,
-                      memories: 200,
-                      isSelected: false,
-                    ),
-                  ],
-                ),
+                height: 65,
+                child: ListView.builder(
+                    itemCount: years.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      return MyCard(
+                        year: years[index]['year'],
+                        isSelected: false,
+                      );
+                    }),
               ),
               SizedBox(
                 height: 20,
               ),
-              // Container(
-              //   height: 40,
-              //   child: ListView.builder(
-              //       itemCount: 10,
-              //       scrollDirection: Axis.horizontal,
-              //       itemBuilder: (context, index) {
-              //         // MONTH VARIABLE
-              //         String m = months[index];
-              //         return MonthCard(
-              //             month: m, isSelected: index == 0 ? true : false);
-              //       }),
-              // ),
               SizedBox(
                 height: 20,
               ),
@@ -264,72 +240,38 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    itemCount: stories.length,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (contex, index) {
+                    itemCount: stories.length,
+                    itemBuilder: (context, index) {
                       Map story = stories[index];
                       int contentLength = (story['content'].length >= 100)
                           ? 100
                           : story['content'].length;
-                      return Container(
-                        padding: const EdgeInsets.all(10.0),
-                        margin: const EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              story['title'],
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ShowStoryScreen(id: story['id']),
                             ),
-                            SizedBox(height: 10),
-                            // story['image'].toString() != ""
-                            //     ? Container(
-                            //         height: 100,
-                            //         width: double.infinity,
-                            //         decoration: BoxDecoration(),
-                            //         child: Image.file(
-                            //           fit: BoxFit.cover,
-                            //           File(
-                            //             story['image'],
-                            //           ),
-                            //         ),
-                            //       )
-                            //     : SizedBox(
-                            //         height: 20,
-                            //       ),
-                            Text(
-                                "${story['content'].toString().substring(0, contentLength)} ...")
-                          ],
+                          );
+                        },
+                        child: HomeCardPost(
+                          story: story,
+                          contentLength: contentLength,
                         ),
                       );
                     }),
               ),
-              // cardHome(
-              //   date: null,
-              //   time: null,
-              // ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home_filled,
-              ),
-              label: ""),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.art_track_sharp,
               ),
               label: ""),
           BottomNavigationBarItem(

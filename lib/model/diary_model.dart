@@ -19,6 +19,7 @@ class Diary {
           'content': content,
           'date': date,
           'image': image ?? "",
+          'year': DateTime.now().year.toString()
         },
         conflictAlgorithm: ConflictAlgorithm.ignore);
   }
@@ -32,10 +33,15 @@ class Diary {
   Future<void> update() async {
     Database db = await MyDatabase().initDatabase();
     await db.update(
-        "post",
-        where: "id = ?",
-        whereArgs: [id],
-        {'title': title, 'content': content, 'image': image});
+      "post",
+      where: "id = ?",
+      whereArgs: [id],
+      {
+        'title': title,
+        'content': content,
+        'image': image,
+      },
+    );
   }
 
   Future<List> getById() async {
@@ -53,5 +59,28 @@ class Diary {
   Future<void> deleteAll() async {
     Database db = await MyDatabase().initDatabase();
     await db.delete("post");
+  }
+
+  Future<List> getByText(String text) async {
+    Database db = await MyDatabase().initDatabase();
+    List data = await db.rawQuery(
+        "SELECT * FROM post WHERE content LIKE '%${text}%' OR title LIKE '%${text}%' ");
+    return data;
+  }
+
+  Future<List> getYear() async {
+    Database db = await MyDatabase().initDatabase();
+    List years =
+        await db.rawQuery("SELECT DISTINCT year FROM post ORDER BY year");
+    return years;
+  }
+
+  Future<int> getMemories(int year) async {
+    Database db = await MyDatabase().initDatabase();
+    final result =
+        await db.rawQuery("SELECT COUNT(*) FROM post WHERE year = $year");
+    final int? count = Sqflite.firstIntValue(result);
+    int count2 = count ?? 0;
+    return count2;
   }
 }

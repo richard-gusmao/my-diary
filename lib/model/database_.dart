@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 class MyDatabase {
   Future<Database> initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'myDiary_sql_all_data.db');
+    String path = join(documentsDirectory.path, 'myDiary.db');
     return await openDatabase(path, version: 1,
         onCreate: (Database db, version) async {
       await db.execute('''
@@ -16,7 +16,8 @@ class MyDatabase {
       content TEXT,
       image TEXT,
       date TEXT,
-      time INTEGER
+      time INTEGER,
+      year INTEGER
 )
 ''');
     });
